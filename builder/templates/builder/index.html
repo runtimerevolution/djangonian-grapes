@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block content %}
+    {% csrf_token %}
+    <div id="editor" style="height: 100%; border: 1px solid #ddd;"></div>
+
+    <script>
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        const editor = grapesjs.init({
+            container: '#editor',
+            fromElement: true,
+            width: 'auto',
+            height: '1000px',
+            panels: { defaults: [] }, // Disable panels if not needed
+            plugins: ['grapesjs-preset-webpage'],
+            pluginsOpts: {
+                'grapesjs-preset-webpage': {
+                    // options
+                }
+            },
+            storageManager: {
+                type: 'remote',
+                autosave: true,
+                autoload: true,
+                stepsBeforeSave: 1,
+                options: {
+                    remote: {
+                        headers: {'X-CSRFToken': csrftoken},
+                        urlLoad: "/builder/load/{{ page.id }}",
+                        urlStore: "/builder/save/{{ page.id }}",
+                        onStore: data => {
+                            html = editor.getHtml();
+                            css = editor.getCss();
+                            return { id: {{ page.id }}, data, html, css };
+                        },
+                        onLoad: result => {
+                            return result.data
+                        },
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}

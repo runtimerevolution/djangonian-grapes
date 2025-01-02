@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% if page %}
+    {% block css %}
+        <style>
+            {{ page.css }}
+        </style>
+    {% endblock %}
+    
+    {% block content %}
+        {{ page.html | safe }}
+    {% endblock %}
+{% endif %}
